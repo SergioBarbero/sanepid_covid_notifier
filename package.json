@@ -3,16 +3,16 @@
   "version": "1.0.0",
   "description": "Automatically answers recruiters",
   "main": "main.js",
-  "scripts": {
-    "test": "node main.js"
-  },
+  "scripts": {},
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
     "dotenv": "^8.2.0",
-    "puppeteer": "^2.0.0"
+    "es6-dynamic-template": "^2.0.0",
+    "puppeteer": "^2.0.0",
+    "yargs": "^15.0.2"
   },
   "devDependencies": {
     "eslint": "^6.8.0"
