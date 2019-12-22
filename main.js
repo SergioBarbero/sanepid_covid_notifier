@@ -29,5 +29,6 @@ const password = argv.p;
   await page.type('.msg-form__contenteditable.t-14.t-black--light.t-normal.flex-grow-1.notranslate', message);
   await page.waitFor(1000);
   await page.click('.msg-form__send-button.artdeco-button.artdeco-button--1');
+  await browser.close();
 })();
 
