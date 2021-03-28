@@ -1,9 +1,19 @@
-# LinkedIn bot answerer
+# Sanepid covid test notifier
 
-Simple application that answers job offers automatically
+Simple application that notifies to your email when test results are available from covid19.gyncentrum.pl/sanepid
 
-Currently it replies to the last message found in your Linkedin inbox.
+## How to run
 
-## How to execute
+1. Create .env file in root with 
 
-``node main.js -n "Your name" -u "Your Linkedin Email" -p "Your Linkedin Password"``
+```
+FROM=<sender_gmail>
+FROM_PASSWORD=<sender_password>
+TO=<receiver_email>
+```
+
+2. Run
+
+```
+node main.js <PESEL> <TEST_CODE>
+```

@@ -1,34 +1,61 @@
 const puppeteer = require('puppeteer');
+var nodemailer = require('nodemailer');
+const cron = require('node-cron');
+var shell = require('shelljs');
+
 require('dotenv').config();
-const cheerio = require('cheerio');
-const fillTemplate = require('es6-dynamic-template');
 
-const argv = require('yargs').argv;
-const myName = argv.n;
-const username = argv.u;
-const password = argv.p;
+const pesel = process.argv[2];
+const code = process.argv[3];
+const emailFrom = process.env.FROM;
+const password = process.env.FROM_PASSWORD;
+const emailTo = process.env.TO;
 
-(async () => {
-  const browser = await puppeteer.launch({headless: false});
-  const page = await browser.newPage();
-  await page.goto('https://linkedin.com');
-  await page.click('.nav__button-secondary');
-  await page.waitFor(1000);
-  await page.waitForSelector('#username', {visible: true});
-  await page.type('#username', username, {delay: 100});
-  await page.type('#password', password, {delay: 100});
-  await page.waitFor(1500);
-  await page.keyboard.press('Enter');
-  await page.waitFor(2000);
-  await page.goto('https://www.linkedin.com/messaging');
-  const content = await page.content();
-  const $ = cheerio.load(content);
-  const recruiterName = $('.msg-conversation-listitem__participant-names.msg-conversation-card__participant-names.truncate.pr1.t-16.t-black.t-normal').text().trim().split(" ")[0];
-  await page.waitFor(2000);
-  const message = fillTemplate(process.env.MESSAGE, { myName: myName, recruiterName: recruiterName });
-  await page.type('.msg-form__contenteditable.t-14.t-black--light.t-normal.flex-grow-1.notranslate', message);
-  await page.waitFor(1000);
-  await page.click('.msg-form__send-button.artdeco-button.artdeco-button--1');
-  await browser.close();
-})();
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: emailFrom,
+    pass: password
+  }
+});
 
+var mailOptions = {
+  from: emailFrom,
+  to: emailTo,
+  subject: 'Results available',
+  text: 'Covid test available'
+};
+
+cron.schedule('*/10 * * * *', async () => {
+  (async () => {
+    const browser = await puppeteer.launch({headless: false});
+    const page = await browser.newPage();
+    await page.setViewport({ width: 1366, height: 768});
+    await page.goto('https://covid19.gyncentrum.pl/sanepid');
+  
+    await page.type('#pesel_aut', pesel, {delay: 100});
+    await page.type('#nr_probki_aut', code, {delay: 100});
+    await page.click('.button.primary.fit');
+  
+    page.waitForNavigation(5);
+    await page.waitForSelector('div#wynik_link > a');
+    try {
+      await page.click('div#wynik_link > a');
+      transporter.sendMail(mailOptions, async (error, info) => {
+        if (error) {
+          console.log(error);
+          await browser.close();
+        } else {
+          console.log('Email sent: ' + info.response);
+          await browser.close();
+        }
+      });
+    } catch (err) {
+      console.log(err);
+      console.log("Results not uploaded")
+      browser.close();
+    } finally {
+      await browser.close();
+    }
+  })();
+});
