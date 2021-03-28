@@ -12,7 +12,13 @@ FROM_PASSWORD=<sender_password>
 TO=<receiver_email>
 ```
 
-2. Run
+2. Install
+
+```
+npm install
+```
+
+3. Run
 
 ```
 node main.js <PESEL> <TEST_CODE>
