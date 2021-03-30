@@ -28,7 +28,7 @@ var mailOptions = {
 
 cron.schedule('*/10 * * * *', async () => {
   (async () => {
-    const browser = await puppeteer.launch({headless: false});
+    const browser = await puppeteer.launch({headless: true});
     const page = await browser.newPage();
     await page.setViewport({ width: 1366, height: 768});
     await page.goto('https://covid19.gyncentrum.pl/sanepid');
